@@ -11,7 +11,7 @@ app.use(express.json());
 // Enable CORS for the frontend application
 app.use(
   cors({
-    origin: CORS_ORIGIN,
+    origin: "https://campusearn.vercel.app",
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   }),
