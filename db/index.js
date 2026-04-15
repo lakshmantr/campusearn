@@ -2,12 +2,11 @@ const { Pool } = require('pg');
 const { DATABASE_URL, DB_SSL } = require('../config');
 
 const pool = new Pool({
-  connectionString: DATABASE_URL,
-  ssl: DB_SSL
-    ? {
-        rejectUnauthorized: false,
-      }
-    : false,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  },
+  family: 4 
 });
 
 pool.on('error', (error) => {
