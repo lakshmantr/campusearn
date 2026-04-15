@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: campus-earn-backend
+    env: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+      - key: JWT_SECRET
+      - key: CORS_ORIGIN
+      - key: DB_SSL
