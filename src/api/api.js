@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = "https://campusearn.onrender.com/api";
+const baseURL = "https://campusearn.onrender.com/";
 
 const api = axios.create({
   baseURL,
