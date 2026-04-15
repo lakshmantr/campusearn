@@ -1,5 +1,6 @@
-const connectionString = process.env.DATABASE_URL;
+const { Pool } = require('pg');
 
+const connectionString = process.env.DATABASE_URL;
 const url = new URL(connectionString);
 
 const pool = new Pool({
@@ -10,7 +11,8 @@ const pool = new Pool({
   database: url.pathname.slice(1),
   ssl: {
     rejectUnauthorized: false
-  }
+  },
+  options: '-c inet_family=4'
 });
 pool.on('error', (error) => {
   console.error('Unexpected database error', error);
