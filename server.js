@@ -1,12 +1,12 @@
-require('dotenv').config(); // Load environment variables
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { authGuard, requireRole } = require('./middleware/auth'); // Path to the code you shared
+const { authGuard, requireRole } = require('./middleware/auth'); 
 const apiRouter = require('./routes'); 
 
 const app = express();
 
-// 1. MUST BE FIRST: CORS Configuration
+// 1. DYNAMIC CORS (Fixes the "not equal to supplied origin" error)
 const allowedOrigins = [
   "http://localhost:5173",
   "https://campusearnlm.vercel.app",
@@ -18,8 +18,8 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true); // This dynamically sets Access-Control-Allow-Origin to the requester's URL
     } else {
       callback(new Error('Not allowed by CORS'));
     }
@@ -29,53 +29,27 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// 2. Request Parsers
+// 2. Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. Health Check (Public)
+// 3. Health Check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    message: 'CampusEarn backend is running',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ status: 'ok', message: 'Backend is running' });
 });
 
-// 4. Example: How to use your middleware on specific routes
-// This route is protected: only logged-in Admins can see it
-app.get('/api/admin-only', authGuard, requireRole('admin'), (req, res) => {
-  res.json({ message: `Hello Admin ${req.auth.email}, you have access.` });
-});
-
-// 5. Main API Routes
+// 4. API Routes
 app.use('/api', apiRouter);
 
-// 6. 404 Handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-// 7. Global Error Handler
+// 5. Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('SERVER_ERROR:', err.stack);
-  
-  // Handle CORS errors specifically
-  if (err.message === 'Not allowed by CORS') {
-    return res.status(403).json({ error: 'CORS policy blocked this request' });
-  }
-
+  console.error(err.stack);
   res.status(err.status || 500).json({
     error: err.message || 'Internal Server Error'
   });
 });
 
-// Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`
-  🚀 CampusEarn Backend ready!
-  📡 Port: ${PORT}
-  🔗 Allowed Origins: ${allowedOrigins.join(', ')}
-  `);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
